@@ -3,6 +3,7 @@
 
 using Microsoft.Build.Framework;
 using System.IO;
+using System.Threading;
 using XliffTasks.Model;
 
 namespace XliffTasks.Tasks
@@ -26,40 +27,50 @@ namespace XliffTasks.Tasks
 
         protected override void ExecuteCore()
         {
-            foreach (var item in Sources)
+
+            using (Mutex mtx = new Mutex(false, "things"))
             {
-                string sourcePath = item.ItemSpec;
-                string sourceFormat = item.GetMetadataOrThrow(MetadataKey.XlfSourceFormat);
-                TranslatableDocument sourceDocument = LoadSourceDocument(sourcePath, sourceFormat);
-                string sourceDocumentId = GetSourceDocumentId(sourcePath);
 
-                foreach (var language in Languages)
+                while (!mtx.WaitOne(1000))
                 {
-                    string xlfPath = GetXlfPath(sourcePath, language);
-                    XlfDocument xlfDocument;
-
-                    try
+                    foreach (var item in Sources)
                     {
-                        xlfDocument = LoadXlfDocument(xlfPath, language, createIfNonExistent: AllowModification);
-                    }
-                    catch (FileNotFoundException ex) when (ex.FileName == xlfPath)
-                    {
-                        Release.Assert(!AllowModification);
-                        throw new BuildErrorException($"'{xlfPath}' for '{sourcePath}' does not exist. {HowToUpdate}");
-                    }
+                        string sourcePath = item.ItemSpec;
+                        string sourceFormat = item.GetMetadataOrThrow(MetadataKey.XlfSourceFormat);
+                        TranslatableDocument sourceDocument = LoadSourceDocument(sourcePath, sourceFormat);
+                        string sourceDocumentId = GetSourceDocumentId(sourcePath);
 
-                    if (!xlfDocument.Update(sourceDocument, sourceDocumentId))
-                    {
-                        continue; // no changes
-                    }
+                        foreach (var language in Languages)
+                        {
+                            string xlfPath = GetXlfPath(sourcePath, language);
+                            XlfDocument xlfDocument;
 
-                    if (!AllowModification)
-                    {
-                        throw new BuildErrorException($"'{xlfPath}' is out-of-date with '{sourcePath}'. {HowToUpdate}");
-                    }
+                            try
+                            {
+                                xlfDocument = LoadXlfDocument(xlfPath, language, createIfNonExistent: AllowModification);
+                            }
+                            catch (FileNotFoundException ex) when (ex.FileName == xlfPath)
+                            {
+                                Release.Assert(!AllowModification);
+                                throw new BuildErrorException($"'{xlfPath}' for '{sourcePath}' does not exist. {HowToUpdate}");
+                            }
 
-                    Directory.CreateDirectory(Path.GetDirectoryName(xlfPath));
-                    xlfDocument.Save(xlfPath);
+                            if (!xlfDocument.Update(sourceDocument, sourceDocumentId))
+                            {
+                                continue; // no changes
+                            }
+
+                            if (!AllowModification)
+                            {
+                                throw new BuildErrorException($"'{xlfPath}' is out-of-date with '{sourcePath}'. {HowToUpdate}");
+                            }
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(xlfPath));
+                            xlfDocument.Save(xlfPath);
+                        }
+
+                        mtx.ReleaseMutex();
+                    }
                 }
             }
         }
