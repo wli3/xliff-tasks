@@ -167,6 +167,5 @@ namespace XliffTasks.Tests
             xliffDocument.Save(writer);
             return writer.ToString();
         }
-
     }
 }
