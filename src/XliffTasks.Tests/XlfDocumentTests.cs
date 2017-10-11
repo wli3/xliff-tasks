@@ -25,7 +25,7 @@ namespace XliffTasks.Tests
   </file>
 </xliff>";
 
-            Assert.Equal(expected, writer.ToString());
+            AssertHelper.AssertWithoutLineEndingDifference(expected, writer.ToString());
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace XliffTasks.Tests
     </body>
   </file>
 </xliff>";
-            Assert.Equal(xliff, Update(xliff: "", resx: resx));
+            AssertHelper.AssertWithoutLineEndingDifference(xliff, Update(xliff: "", resx: resx));
 
             // loc team translates
             string xliffAfterFirstTranslation =
@@ -141,7 +141,7 @@ namespace XliffTasks.Tests
   </file>
 </xliff>";
 
-            Assert.Equal(
+            AssertHelper.AssertWithoutLineEndingDifference(
                 xliffAfterApplyingResxModification, 
                 Update(xliff: xliffAfterFirstTranslation, resx: resxAfterFirstModification));
         }
@@ -167,5 +167,6 @@ namespace XliffTasks.Tests
             xliffDocument.Save(writer);
             return writer.ToString();
         }
+
     }
 }
