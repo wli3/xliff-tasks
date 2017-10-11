@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace XliffTasks.Model
@@ -47,9 +49,24 @@ namespace XliffTasks.Model
 
                 yield return new TranslatableXmlElement(
                     id: name,
-                    source: value, 
-                    note: comment, 
+                    source: value,
+                    note: comment,
                     element: valueElement);
+            }
+        }
+
+        protected override void LoadCore(TextReader reader)
+        {
+            base.LoadCore(reader);
+
+            foreach (var node in Document.Descendants("data").ToList())
+            {
+                // delete nodes that point to external files (used often for icons, etc.)
+                // these will have relative paths that cannot be easily adjusted and this binary data can be retrieved from the neutral resources.
+                if (node.Attribute("type")?.Value == "System.Resources.ResXFileRef, System.Windows.Forms")
+                {
+                    node.Remove();
+                }
             }
         }
     }

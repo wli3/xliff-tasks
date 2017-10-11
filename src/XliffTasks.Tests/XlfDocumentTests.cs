@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.IO;
 using XliffTasks.Model;
 using Xunit;
@@ -25,7 +26,12 @@ namespace XliffTasks.Tests
   </file>
 </xliff>";
 
-            Assert.Equal(expected, writer.ToString());
+            AssertEqualWithoutDifferentInLineEnd(writer.ToString(), expected);
+        }
+
+        private static void AssertEqualWithoutDifferentInLineEnd(string result, string expected)
+        {
+            Assert.Equal(expected, result.Replace(Environment.NewLine, "\n"));
         }
 
         [Fact]
@@ -69,7 +75,7 @@ namespace XliffTasks.Tests
     </body>
   </file>
 </xliff>";
-            Assert.Equal(xliff, Update(xliff: "", resx: resx));
+            AssertEqualWithoutDifferentInLineEnd(xliff, Update(xliff: "", resx: resx));
 
             // loc team translates
             string xliffAfterFirstTranslation =
@@ -141,8 +147,54 @@ namespace XliffTasks.Tests
   </file>
 </xliff>";
 
-            Assert.Equal(
+            AssertEqualWithoutDifferentInLineEnd(
                 xliffAfterApplyingResxModification, 
+                Update(xliff: xliffAfterFirstTranslation, resx: resxAfterFirstModification));
+        }
+
+        [Fact(DisplayName = "delete nodes that point to external files which relative path cannot be easily adjusted")]
+        public void DeleteNodesPointingExternalFiles()
+        {
+            // loc team translates
+            string xliffAfterFirstTranslation =
+ @"<xliff xmlns=""urn:oasis:names:tc:xliff:document:1.2"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" version=""1.2"" xsi:schemaLocation=""urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd"">
+  <file datatype=""xml"" source-language=""en"" target-language=""fr"" original=""test.resx"">
+    <body>
+      <trans-unit id=""Hello"">
+        <source>Hello!</source>
+        <target state=""translated"">Bonjour!</target>
+        <note>Greeting</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>";
+
+            // dev makes some changes
+            string resxAfterFirstModification =
+@"<root>
+  <data name=""HelloWorld"">
+    <value>Hello World!</value>
+  </data>
+  <data name=""400"" type=""System.Resources.ResXFileRef, System.Windows.Forms"">
+    <value>Resources\Package.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+</root>";
+
+            string xliffAfterApplyingResxModification =
+ @"<xliff xmlns=""urn:oasis:names:tc:xliff:document:1.2"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" version=""1.2"" xsi:schemaLocation=""urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd"">
+  <file datatype=""xml"" source-language=""en"" target-language=""fr"" original=""test.resx"">
+    <body>
+      <trans-unit id=""Goodbye"">
+        <source>Goodbye World!</source>
+        <target state=""needs-review-translation"">Au revoir!</target>
+        <note />
+      </trans-unit>
+    </body>
+  </file>
+</xliff>";
+
+            AssertEqualWithoutDifferentInLineEnd(
+                xliffAfterApplyingResxModification,
                 Update(xliff: xliffAfterFirstTranslation, resx: resxAfterFirstModification));
         }
 
