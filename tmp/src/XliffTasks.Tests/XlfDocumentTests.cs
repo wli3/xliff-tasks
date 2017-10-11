@@ -31,7 +31,7 @@ namespace XliffTasks.Tests
 
         private static void AssertEqualWithoutDifferentInLineEnd(string result, string expected)
         {
-            Assert.Equal(expected, result));
+            Assert.Equal(expected, result.Replace(Environment.NewLine, "\n"));
         }
 
         [Fact]
