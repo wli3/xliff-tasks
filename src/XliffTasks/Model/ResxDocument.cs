@@ -59,10 +59,10 @@ namespace XliffTasks.Model
         {
             base.LoadCore(reader);
 
-            ExcludeNodesPointingExternalFiles();
+            RemoveNodesPointingToExternalFiles();
         }
 
-        private void ExcludeNodesPointingExternalFiles()
+        private void RemoveNodesPointingToExternalFiles()
         {
             foreach (var node in Document.Descendants("data").ToList())
             {
