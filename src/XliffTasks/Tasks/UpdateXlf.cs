@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.Build.Framework;
+using System;
 using System.IO;
 using System.Threading;
 using XliffTasks.Model;
@@ -27,14 +28,10 @@ namespace XliffTasks.Tasks
 
         protected override void ExecuteCore()
         {
-
-            using (Mutex mtx = new Mutex(false, "things"))
+            foreach (var item in Sources)
             {
-
-                while (!mtx.WaitOne(1000))
-                {
-                    foreach (var item in Sources)
-                    {
+                OnlyOneProcessToWorkOn(Path.GetFullPath(item.ItemSpec),
+                    () => {
                         string sourcePath = item.ItemSpec;
                         string sourceFormat = item.GetMetadataOrThrow(MetadataKey.XlfSourceFormat);
                         TranslatableDocument sourceDocument = LoadSourceDocument(sourcePath, sourceFormat);
@@ -68,8 +65,31 @@ namespace XliffTasks.Tasks
                             Directory.CreateDirectory(Path.GetDirectoryName(xlfPath));
                             xlfDocument.Save(xlfPath);
                         }
+                    });
+            }
+        }
+
+        private static void OnlyOneProcessToWorkOn(string filePath, Action action)
+        {
+            using (Mutex mtx = new Mutex(false, @"Global\" + filePath.GetHashCode().ToString()))
+            {
+                int blockTime = 1000;
+                while (true)
+                {
+                    if (mtx.WaitOne(blockTime))
+                    {
+                        action();
 
                         mtx.ReleaseMutex();
+                        break;
+                    }
+                    else
+                    {
+                        blockTime = blockTime * 2;
+                        if (blockTime > 100000)
+                        {
+                            throw new Exception("Cannot aquire mutex to run on one xlf file, there might be a deadlock");
+                        }
                     }
                 }
             }
