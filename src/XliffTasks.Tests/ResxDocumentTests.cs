@@ -74,8 +74,7 @@ namespace XliffTasks.Tests
             var writer = new StringWriter();
             document.Load(new StringReader(source));
             document.RewriteRelativePathsToAbsolute(
-                @"E:\workspace2\roslyn\src\VisualStudio\VisualStudioDiagnosticsToolWindow\Resources.resx",
-                @"E:\workspace2\roslyn\Binaries\Obj\VisualStudioDiagnosticsWindow\Debug\VisualStudioDiagnosticsWindow.xlf\Resources.cs.resx");
+                @"E:\workspace2\roslyn\src\VisualStudio\VisualStudioDiagnosticsToolWindow\Resources.resx");
             document.Save(writer);
 
             AssertHelper.AssertWithoutLineEndingDifference(expectedTranslation, writer.ToString());

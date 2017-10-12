@@ -61,7 +61,7 @@ namespace XliffTasks.Model
             }
        }
 
-        public virtual void RewriteRelativePathsToAbsolute(string sourceDirectory, string destinationFolder)
+        public virtual void RewriteRelativePathsToAbsolute(string sourceFullPath)
         {
 
         }
