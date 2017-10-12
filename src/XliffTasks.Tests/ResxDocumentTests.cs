@@ -49,13 +49,10 @@ namespace XliffTasks.Tests
         }
 
         [Fact]
-        public void DeleteNodesThatPointToExternalWithRelativePathCannotBeEasilyAdjusted()
+        public void RewriteFileReferenceToAbsoluteInDestinyFolder()
         {
             string source =
 @"<root>
-  <data name=""Hello"" xml:space=""preserve"">
-    <value>Hello!</value>
-  </data>
   <data name=""400"" type=""System.Resources.ResXFileRef, System.Windows.Forms"">
     <value>Resources\Package.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -68,15 +65,17 @@ namespace XliffTasks.Tests
 
             string expectedTranslation =
 @"<root>
-  <data name=""Hello"" xml:space=""preserve"">
-    <value>Bonjour!</value>
+  <data name=""400"" type=""System.Resources.ResXFileRef, System.Windows.Forms"">
+    <value>E:\workspace2\roslyn\src\VisualStudio\VisualStudioDiagnosticsToolWindow\Resources\Package.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>";
 
             var document = new ResxDocument();
             var writer = new StringWriter();
             document.Load(new StringReader(source));
-            document.Translate(translations);
+            document.RewriteRelativePathsToAbsolute(
+                @"E:\workspace2\roslyn\src\VisualStudio\VisualStudioDiagnosticsToolWindow\Resources.resx",
+                @"E:\workspace2\roslyn\Binaries\Obj\VisualStudioDiagnosticsWindow\Debug\VisualStudioDiagnosticsWindow.xlf\Resources.cs.resx");
             document.Save(writer);
 
             AssertHelper.AssertWithoutLineEndingDifference(expectedTranslation, writer.ToString());

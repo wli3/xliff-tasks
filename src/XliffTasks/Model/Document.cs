@@ -28,7 +28,6 @@ namespace XliffTasks.Model
         /// </summary>
         public void Load(string path)
         {
-            Add retry here
             using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 Load(stream);
