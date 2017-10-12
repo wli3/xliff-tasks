@@ -61,6 +61,11 @@ namespace XliffTasks.Model
             }
        }
 
+        public virtual void RewriteRelativePathsToAbsolute(string sourceDirectory, string destinationFolder)
+        {
+
+        }
+
         protected abstract void LoadCore(TextReader reader);
 
         protected abstract void SaveCore(TextWriter writer);

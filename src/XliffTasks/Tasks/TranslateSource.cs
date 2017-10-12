@@ -24,6 +24,8 @@ namespace XliffTasks.Tasks
             sourceDocument.Translate(xlfDocument.GetTranslations());
 
             Directory.CreateDirectory(Path.GetDirectoryName(translatedFullPath));
+
+            sourceDocument.RewriteRelativePathsToAbsolute(sourcePath, translatedFullPath);
             sourceDocument.Save(translatedFullPath);
         }
     }

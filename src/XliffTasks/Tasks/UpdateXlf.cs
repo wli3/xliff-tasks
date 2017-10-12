@@ -63,6 +63,7 @@ namespace XliffTasks.Tasks
                             }
 
                             Directory.CreateDirectory(Path.GetDirectoryName(xlfPath));
+                            Add not access retry here
                             xlfDocument.Save(xlfPath);
                         }
                     });

@@ -55,22 +55,13 @@ namespace XliffTasks.Model
             }
         }
 
-        protected override void LoadCore(TextReader reader)
+        public override void RewriteRelativePathsToAbsolute(string sourcePath, string destinationPath)
         {
-            base.LoadCore(reader);
-
-            RemoveNodesPointingToExternalFiles();
-        }
-
-        private void RemoveNodesPointingToExternalFiles()
-        {
-            // delete nodes that point to external files (used often for icons, etc.)
-            // these will have relative paths that cannot be easily adjusted and this binary data can be retrieved from the neutral resources.
             foreach (var node in Document.Descendants("data").ToList())
             {
                 if (node.Attribute("type")?.Value == "System.Resources.ResXFileRef, System.Windows.Forms")
                 {
-                    node.Remove();
+                    //
                 }
             }
         }
