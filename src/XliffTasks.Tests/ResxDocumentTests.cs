@@ -48,8 +48,8 @@ namespace XliffTasks.Tests
             AssertHelper.AssertWithoutLineEndingDifference(expectedTranslation, writer.ToString());
         }
 
-        [Fact(DisplayName = "delete nodes that point to external files which relative path cannot be easily adjusted")]
-        public void DeleteNodesPointingExternalFiles()
+        [Fact]
+        public void DeleteNodesThatPointToExternalWithRelativePathCannotBeEasilyAdjusted()
         {
             string source =
 @"<root>

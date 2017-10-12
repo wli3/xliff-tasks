@@ -64,6 +64,8 @@ namespace XliffTasks.Model
 
         private void RemoveNodesPointingToExternalFiles()
         {
+            // delete nodes that point to external files (used often for icons, etc.)
+            // these will have relative paths that cannot be easily adjusted and this binary data can be retrieved from the neutral resources.
             foreach (var node in Document.Descendants("data").ToList())
             {
                 if (node.Attribute("type")?.Value == "System.Resources.ResXFileRef, System.Windows.Forms")
