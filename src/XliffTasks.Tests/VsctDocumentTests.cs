@@ -71,25 +71,20 @@ namespace XliffTasks.Tests
         }
 
         [Fact]
-        public void RewriteFileReferenceToAbsoluteInDestinyFolder()
+        public void RewriteHrefOfImageToAbsoluteInDestinyFolder()
         {
             string source =
-@"<?xml version=""1.0"" encoding=""utf-8""?>
-<CommandTable xmlns=""http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
-    <Bitmaps>
-      <Bitmap guid=""guidImages"" href=""Resources\Images.png"" usedList=""bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows""/>
-    </Bitmaps>
-  </Commands>
-</CommandTable>
-";
+@"<CommandTable xmlns=""http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <Bitmaps>
+    <Bitmap guid=""guidImages"" href=""Resources\Images.png"" usedList=""bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"" />
+  </Bitmaps>
+</CommandTable>";
 
             string expectedTranslation =
 @"<CommandTable xmlns=""http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
-<CommandTable xmlns=""http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
-    <Bitmaps>
-      <Bitmap guid=""guidImages"" href=""E:\sourceFolder\Resources\Images.png"" usedList=""bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows""/>
-    </Bitmaps>
-  </Commands>
+  <Bitmaps>
+    <Bitmap guid=""guidImages"" href=""E:\sourceFolder\Resources\Images.png"" usedList=""bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"" />
+  </Bitmaps>
 </CommandTable>";
 
             var document = new VsctDocument();
@@ -101,8 +96,5 @@ namespace XliffTasks.Tests
 
             AssertHelper.AssertWithoutLineEndingDifference(expectedTranslation, writer.ToString());
         }
-
     }
-
-
 }
