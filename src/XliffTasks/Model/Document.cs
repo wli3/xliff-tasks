@@ -28,7 +28,7 @@ namespace XliffTasks.Model
         /// </summary>
         public void Load(string path)
         {
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 Load(stream);
             }
@@ -64,7 +64,7 @@ namespace XliffTasks.Model
         {
             EnsureContent();
 
-            using (var stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+            using (var stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
                 Save(stream);
             }
