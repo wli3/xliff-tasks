@@ -66,7 +66,7 @@ namespace XliffTasks.Tests
             string expectedTranslation =
 @"<root>
   <data name=""400"" type=""System.Resources.ResXFileRef, System.Windows.Forms"">
-    <value>E:\workspace2\roslyn\src\VisualStudio\VisualStudioDiagnosticsToolWindow\Resources\Package.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>E:\sourceFolder\Resources\Package.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>";
 
@@ -74,7 +74,7 @@ namespace XliffTasks.Tests
             var writer = new StringWriter();
             document.Load(new StringReader(source));
             document.RewriteRelativePathsToAbsolute(
-                @"E:\workspace2\roslyn\src\VisualStudio\VisualStudioDiagnosticsToolWindow\Resources.resx");
+                @"E:\sourceFolder\Resources.resx");
             document.Save(writer);
 
             AssertHelper.AssertWithoutLineEndingDifference(expectedTranslation, writer.ToString());
