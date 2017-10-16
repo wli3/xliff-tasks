@@ -63,10 +63,25 @@ namespace XliffTasks.Model
         public void Save(string path)
         {
             EnsureContent();
+            var tempPath = Path.Combine(Path.GetDirectoryName(path), Path.GetRandomFileName());
 
-            using (var stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+
+            using (var stream = File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
                 Save(stream);
+            }
+
+            try
+            {
+                File.Move(tempPath, path);
+            }
+            catch (IOException e)
+            when (e.Message.Contains("Cannot create a file when that file already exists"))
+            {
+                File.Replace(tempPath,
+                    path,
+                    Path.ChangeExtension(tempPath, "back"),
+                    true);
             }
         }
 
