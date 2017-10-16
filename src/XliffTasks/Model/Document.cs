@@ -71,7 +71,18 @@ namespace XliffTasks.Model
                 Save(stream);
             }
 
-            File.Move(tempPath, path);
+            try
+            {
+                File.Move(tempPath, path);
+            }
+            catch (IOException e)
+            when (e.Message.Contains("Cannot create a file when that file already exists"))
+            {
+                File.Replace(tempPath,
+                    path,
+                    Path.ChangeExtension(tempPath, "back"),
+                    true);
+            }
         }
 
         /// <summary>
