@@ -63,11 +63,14 @@ namespace XliffTasks.Model
         public void Save(string path)
         {
             EnsureContent();
-            
-            using (var stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+            var tempPath = Path.GetRandomFileName();
+
+            using (var stream = File.Open(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None))
             {
                 Save(stream);
             }
+
+            File.Replace(tempPath, path, Path.ChangeExtension(path, "back"), true);
         }
 
         /// <summary>
